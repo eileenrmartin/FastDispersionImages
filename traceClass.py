@@ -1,3 +1,7 @@
+########### Basics of a trace class that users can build on.
+########### Author: Eileen R. Martin, Stanford University, Dec. 2015
+########### Available at github.com/eileenrmartin/FastDispersionImages
+
 import numpy as np
 import scipy.fftpack as ft
 

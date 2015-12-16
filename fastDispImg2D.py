@@ -1,6 +1,9 @@
+########### Code for calculating 2D dispersion images quickly.
+########### Author: Eileen R. Martin, Stanford University, Dec. 2015
+########### Available at github.com/eileenrmartin/FastDispersionImages
+
 import math
 import numpy as np
-import numpy.linalg as la
 import scipy.fftpack as ft
 import traceClass as tr
 

@@ -1,3 +1,7 @@
+########### Code for calculating 3D dispersion image cubes quickly.
+########### Author: Eileen R. Martin, Stanford University, Dec. 2015
+########### Available at github.com/eileenrmartin/FastDispersionImages
+
 import math
 import numpy as np
 import scipy.fftpack as ft
