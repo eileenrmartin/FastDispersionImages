@@ -14,8 +14,8 @@ def sigma2D(traces, velocities, minFreq, maxFreq, filterFunction):
 
 	# define dimensions of sigma
 	nVel = velocities.size
-	minFrqIdx = traces[0].getIdxFromHz(minFreq)
-	maxFrqIdx = traces[0].getIdxFromHz(maxFreq)
+	minFrqIdx = int(traces[0].getIdxFromHz(minFreq))
+	maxFrqIdx = int(traces[0].getIdxFromHz(maxFreq))
 	nFrq = maxFrqIdx-minFrqIdx
 	# initialize the common factor to all dispersion images
 	sigma = np.zeros((nVel,2*nFrq))
@@ -52,8 +52,8 @@ def dispImg2D(aFilteredTrace, velocities, minFreq, maxFreq, sigma):
 	'''aFilteredTrace is a trace object (defined in traceClass.py) assumed to have already been filtered that will act as a virtual source for this dispersion image. minFreq and maxFreq are the minimum/maximum positive frequencies of interest (Hz). velocities are a 1D numpy array of velocities of interest (m/s). minFreq and maxFreq are the minimum/maximum positive frequencies of interest (Hz). sigma is the common factor in all dispersion images that use these traces as receivers, which is returned by sigma2D() as a 2D numpy array nVel x 2*nFrq where nFrq is the number of frequency bins between minFreq and maxFreq. The sigma matrix will be in the order velocities[0],velocities[1],...,velocities[-1] and in the other direction minFreq,...,maxFreq,-maxFreq,...,-minFreq. This function will return a dispersion image in the order velocities[0],velocities[1],...,velocities[-1] and in the other direction minFreq,...,maxFreq. It will have been symmetrized for positive and negative frequencies, and all returned values will be non-negative.'''
 
 	# define dimensions of spectrum of interest
-	minFrqIdx = aFilteredTrace.getIdxFromHz(minFreq)
-	maxFrqIdx = aFilteredTrace.getIdxFromHz(maxFreq)
+	minFrqIdx = int(aFilteredTrace.getIdxFromHz(minFreq))
+	maxFrqIdx = int(aFilteredTrace.getIdxFromHz(maxFreq))
 	nFrq = maxFrqIdx - minFrqIdx
 
 	# just get the data spectrum limited to frequencies of interest
