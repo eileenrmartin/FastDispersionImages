@@ -10,41 +10,47 @@ import traceClass as tr
 
 
 def sigma2D(traces, velocities, minFreq, maxFreq, filterFunction):
-	'''traces is a list of trace objects (defined in traceClass.py) assumed to all have the same length traces with the same sampling rate. velocities are a 1D numpy array of velocities of interest (m/s). minFreq and maxFreq are the minimum/maximum positive frequencies of interest (Hz). filterFunction is a user-defined function that takes a single trace as input and filters it. This calculates the common factor (sigma) in all dispersion images that use these traces as receivers, which is returned as a 2D numpy array nVel x 2*nFrq where nFrq is the number of frequency bins between minFreq and maxFreq. This will return results in the order velocities[0],velocities[1],...,velocities[-1] and in the other direction minFreq,...,maxFreq,-maxFreq,...,-minFreq'''
+    '''traces is a list of trace objects (defined in traceClass.py) assumed to all have the same length traces with the same sampling rate. velocities are a 1D numpy array of velocities of interest (m/s). minFreq and maxFreq are the minimum/maximum positive frequencies of interest (Hz). filterFunction is a user-defined function that takes a single trace as input and filters it. This calculates the common factor (sigma) in all dispersion images that use these traces as receivers, which is returned as a 2D numpy array nVel x 2*nFrq where nFrq is the number of frequency bins between minFreq and maxFreq. This will return results in the order velocities[0],velocities[1],...,velocities[-1] and in the other direction minFreq,...,maxFreq,-maxFreq,...,-minFreq'''
+    
+    
+    # define dimensions of sigma
+    nVel = velocities.size
+    minFrqIdx = int(traces[0].getIdxFromHz(minFreq))
+    maxFrqIdx = int(traces[0].getIdxFromHz(maxFreq))
+    nFrq = maxFrqIdx-minFrqIdx
 
-	# define dimensions of sigma
-	nVel = velocities.size
-	minFrqIdx = int(traces[0].getIdxFromHz(minFreq))
-	maxFrqIdx = int(traces[0].getIdxFromHz(maxFreq))
-	nFrq = maxFrqIdx-minFrqIdx
-	# initialize the common factor to all dispersion images
-	sigma = np.zeros((nVel,2*nFrq))
+    # initialize the common factor to all dispersion images
+    sigma = np.zeros((nVel,2*nFrq))
 
-	# calculate the frequencies of interest
-	actualMinFrq = minFrqIdx*traces[0].getNHzPerBin()
-	actualMaxFrq = maxFrqIdx*traces[0].getNHzPerBin()
-	posNegFrqs = np.hstack((np.linspace(actualMinFrq,actualMaxFrq,nFrq),-1*np.flipud(np.linspace(actualMinFrq,actualMaxFrq,nFrq))))
+    # calculate the frequencies of interest
+    actualMinFrq = minFrqIdx*traces[0].getNHzPerBin()
+    actualMaxFrq = maxFrqIdx*traces[0].getNHzPerBin()
+    posNegFrqs = np.hstack((np.linspace(actualMinFrq,actualMaxFrq,nFrq),-1*np.flipud(np.linspace(actualMinFrq,actualMaxFrq,nFrq))))
+
 
 	# define the phase shift matrix
-	p = 1.0/velocities # slowness vector
-	phaseShiftMat = np.exp(2*np.pi*1j*np.outer(p,posNegFrqs))
-
+    p = 1.0/velocities # slowness vector
+    phaseShiftMat = np.exp(2*np.pi*1j*np.outer(p,posNegFrqs))
+    
+    
 	# for each trace, apply a phase shift to 
-	for r in traces:
+    for r in traces:
 
-		filterFunction(r) # call user-defined filters
+        filterFunction(r) # call user-defined filters
 
 		# just get the spectrum limited to frequencies of interest
-		if(minFrqIdx <= 1):
-			subsetSpec = np.hstack((r.dataSpec[minFrqIdx:maxFrqIdx],r.dataSpec[1-maxFrqIdx:]))
-		else:
-			subsetSpec = np.hstack((r.dataSpec[minFrqIdx:maxFrqIdx],r.dataSpec[1-maxFrqIdx:1-minFrqIdx])) 
-
+        if(minFrqIdx <= 1):
+            subsetSpec = np.hstack((r.dataSpec[minFrqIdx:maxFrqIdx],r.dataSpec[1-maxFrqIdx:]))
+        else:
+            subsetSpec = np.hstack((r.dataSpec[minFrqIdx:maxFrqIdx],r.dataSpec[1-maxFrqIdx:1-minFrqIdx])) 
+   
+        print("TEST",r.x)    
+            
 		# add phase shifted subset of fourier transform of filtered data to sigma
-		sigma = sigma + np.tile(subsetSpec,(nVel,1))*np.power(phaseShiftMat,r.x)
+        sigma = sigma + np.tile(subsetSpec,(nVel,1))*np.power(phaseShiftMat,r.x)
 
 	# return an nVel x 2*nFrq array
-	return sigma
+    return sigma
 
 
 
@@ -85,12 +91,14 @@ def dispImgStack2D(traces, velocities, minFreq, maxFreq, filterFunction):
 	'''traces is a list of trace objects (defined in traceClass.py) assumed to all have the same length traces with the same sampling rate. velocities are a 1D numpy array of velocities of interest (m/s). minFreq and maxFreq are the minimum/maximum positive frequencies of interest (Hz). filterFunction is a user-defined function that takes a single trace as input and filters it. This function will return a dispersion image stacked over all virtual sources in traces. The elements will be in the order velocities[0],velocities[1],...,velocities[-1] and in the other direction minFreq,...,maxFreq. It will have been symmetrized for positive and negative frequencies, and all returned values will be non-negative.'''
 
 	# calculate the sigma common factor to all dispersion images
-	sigmaFactor = sigma2D(traces, velocities, minFreq, maxFreq, filterFunction)
 
+
+	sigmaFactor = sigma2D(traces, velocities, minFreq, maxFreq, filterFunction)
+	
 	# set up zero stack 
 	nVel = velocities.size
 	nFrq = sigmaFactor.shape[1]/2
-	dispImgStack = np.zeros((nVel,nFrq))
+	dispImgStack = np.zeros((nVel,int(nFrq)))
 
 	# for each virtual source calculate the dispersion image and add it to the stack
 	for virtualSource in traces:

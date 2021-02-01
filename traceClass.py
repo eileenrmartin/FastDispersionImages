@@ -36,6 +36,7 @@ class trace:
 			print("Error: requested frequency outside range.")
 			return 0.5 # fraction index should cause errors
 		nHzPerBin = self.getNHzPerBin() # number of Hz in each bin of dataSpec
+
 		idx = int(freqHz/nHzPerBin) 
 		return idx
 
