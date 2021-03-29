@@ -2,13 +2,13 @@
 ########### and fastDispImg3D.
 ########### Author: Eileen R. Martin, Stanford University, Dec. 2015
 ########### Available at github.com/eileenrmartin/FastDispersionImages
-
-
+########### Last edited 3/28/2021 by Anu Trivedi
 
 import traceClass as tr
 import numpy as np
 import fastDispImg2D as fdi2
 import fastDispImg3D as fdi3
+import matplotlib.pyplot as plt
 
 ######### example filter functions ##########
 
@@ -55,6 +55,8 @@ for r in receiverList2D:
 	thisReceiver = tr.trace(thisData,dt2D,position) # create trace object
 	receivers2D.append(thisReceiver) # append the trace object to the list
 
+print("Length of receiver list: ", len(receivers2D))
+
 # Calculate a stack of dispersion images over all virtual sources
 dispImgStack2D = fdi2.dispImgStack2D(receivers2D, velocities, minFrq2D, maxFrq2D, myFilterFunc)
 print('dispersion images stacked over all virtual sources')
@@ -72,10 +74,13 @@ print(sigma2D.shape)
 singleDispImg2D = fdi2.dispImg2D(receivers2D[0], velocities, minFrq2D, maxFrq2D, sigma2D)
 print('dispersion image with first receiver as virtual source')
 print(singleDispImg2D)
-print(singleDispImg2D.shape)
+print("Dispersion image dimesnsions: ", singleDispImg2D.shape)
 
 
-
+# uncomment to plot:
+# plt.imshow(singleDispImg2D, aspect='auto')
+# plt.ylabel('velocity (m/s)')
+# plt.xlabel('frequency (Hz)')
 
 
 
